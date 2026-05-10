@@ -1,10 +1,10 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Mic2, LayoutDashboard, Settings, Calendar, Image, MessageCircle, Heart, History, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Item { to: string; label: string; icon: React.ComponentType<{ className?: string }>; }
 
-export function DashboardLayout({ role }: { role: "musico" | "estabelecimento" }) {
+export function DashboardLayout({ role, children }: { role: "musico" | "estabelecimento"; children: React.ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const items: Item[] = role === "musico" ? [
     { to: "/dashboard/musico", label: "Visão geral", icon: LayoutDashboard },
@@ -64,7 +64,7 @@ export function DashboardLayout({ role }: { role: "musico" | "estabelecimento" }
         </header>
 
         <main className="flex-1 p-4 md:p-10">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>
