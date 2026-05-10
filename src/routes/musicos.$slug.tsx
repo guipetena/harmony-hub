@@ -46,8 +46,8 @@ function MusicianProfile() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="-mt-20 md:-mt-28">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end">
+          <div className="-mt-16 md:-mt-20">
+            <div className="flex flex-col gap-6 md:flex-row md:items-start">
               <img
                 src={m.image}
                 alt={m.artistName}
