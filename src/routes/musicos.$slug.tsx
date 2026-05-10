@@ -46,14 +46,14 @@ function MusicianProfile() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="-mt-20 md:-mt-28">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end">
+          <div className="-mt-16 md:-mt-20">
+            <div className="flex flex-col gap-6 md:flex-row md:items-start">
               <img
                 src={m.image}
                 alt={m.artistName}
                 className="h-36 w-36 shrink-0 rounded-3xl border-4 border-background object-cover shadow-elevated md:h-48 md:w-48"
               />
-              <div className="flex-1">
+              <div className="flex-1 md:pt-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="flex flex-wrap items-center gap-2 font-display text-3xl font-semibold leading-tight pb-1 md:text-5xl">
                     <span className="break-words">{m.artistName}</span>
