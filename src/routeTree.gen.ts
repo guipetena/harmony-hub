@@ -9,10 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ParaMusicosRouteImport } from './routes/para-musicos'
+import { Route as ParaEstabelecimentosRouteImport } from './routes/para-estabelecimentos'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as BuscarRouteImport } from './routes/buscar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MusicosSlugRouteImport } from './routes/musicos.$slug'
+import { Route as DashboardMusicoRouteImport } from './routes/dashboard.musico'
+import { Route as DashboardEstabelecimentoRouteImport } from './routes/dashboard.estabelecimento'
 
+const ParaMusicosRoute = ParaMusicosRouteImport.update({
+  id: '/para-musicos',
+  path: '/para-musicos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParaEstabelecimentosRoute = ParaEstabelecimentosRouteImport.update({
+  id: '/para-estabelecimentos',
+  path: '/para-estabelecimentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuscarRoute = BuscarRouteImport.update({
   id: '/buscar',
   path: '/buscar',
@@ -28,39 +60,142 @@ const MusicosSlugRoute = MusicosSlugRouteImport.update({
   path: '/musicos/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardMusicoRoute = DashboardMusicoRouteImport.update({
+  id: '/musico',
+  path: '/musico',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardEstabelecimentoRoute =
+  DashboardEstabelecimentoRouteImport.update({
+    id: '/estabelecimento',
+    path: '/estabelecimento',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/buscar': typeof BuscarRoute
+  '/cadastro': typeof CadastroRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/para-estabelecimentos': typeof ParaEstabelecimentosRoute
+  '/para-musicos': typeof ParaMusicosRoute
+  '/dashboard/estabelecimento': typeof DashboardEstabelecimentoRoute
+  '/dashboard/musico': typeof DashboardMusicoRoute
   '/musicos/$slug': typeof MusicosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/buscar': typeof BuscarRoute
+  '/cadastro': typeof CadastroRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/para-estabelecimentos': typeof ParaEstabelecimentosRoute
+  '/para-musicos': typeof ParaMusicosRoute
+  '/dashboard/estabelecimento': typeof DashboardEstabelecimentoRoute
+  '/dashboard/musico': typeof DashboardMusicoRoute
   '/musicos/$slug': typeof MusicosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/buscar': typeof BuscarRoute
+  '/cadastro': typeof CadastroRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/para-estabelecimentos': typeof ParaEstabelecimentosRoute
+  '/para-musicos': typeof ParaMusicosRoute
+  '/dashboard/estabelecimento': typeof DashboardEstabelecimentoRoute
+  '/dashboard/musico': typeof DashboardMusicoRoute
   '/musicos/$slug': typeof MusicosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/buscar' | '/musicos/$slug'
+  fullPaths:
+    | '/'
+    | '/buscar'
+    | '/cadastro'
+    | '/dashboard'
+    | '/login'
+    | '/para-estabelecimentos'
+    | '/para-musicos'
+    | '/dashboard/estabelecimento'
+    | '/dashboard/musico'
+    | '/musicos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/buscar' | '/musicos/$slug'
-  id: '__root__' | '/' | '/buscar' | '/musicos/$slug'
+  to:
+    | '/'
+    | '/buscar'
+    | '/cadastro'
+    | '/dashboard'
+    | '/login'
+    | '/para-estabelecimentos'
+    | '/para-musicos'
+    | '/dashboard/estabelecimento'
+    | '/dashboard/musico'
+    | '/musicos/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/buscar'
+    | '/cadastro'
+    | '/dashboard'
+    | '/login'
+    | '/para-estabelecimentos'
+    | '/para-musicos'
+    | '/dashboard/estabelecimento'
+    | '/dashboard/musico'
+    | '/musicos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuscarRoute: typeof BuscarRoute
+  CadastroRoute: typeof CadastroRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ParaEstabelecimentosRoute: typeof ParaEstabelecimentosRoute
+  ParaMusicosRoute: typeof ParaMusicosRoute
   MusicosSlugRoute: typeof MusicosSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/para-musicos': {
+      id: '/para-musicos'
+      path: '/para-musicos'
+      fullPath: '/para-musicos'
+      preLoaderRoute: typeof ParaMusicosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/para-estabelecimentos': {
+      id: '/para-estabelecimentos'
+      path: '/para-estabelecimentos'
+      fullPath: '/para-estabelecimentos'
+      preLoaderRoute: typeof ParaEstabelecimentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/buscar': {
       id: '/buscar'
       path: '/buscar'
@@ -82,12 +217,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MusicosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/musico': {
+      id: '/dashboard/musico'
+      path: '/musico'
+      fullPath: '/dashboard/musico'
+      preLoaderRoute: typeof DashboardMusicoRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/estabelecimento': {
+      id: '/dashboard/estabelecimento'
+      path: '/estabelecimento'
+      fullPath: '/dashboard/estabelecimento'
+      preLoaderRoute: typeof DashboardEstabelecimentoRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
+
+interface DashboardRouteChildren {
+  DashboardEstabelecimentoRoute: typeof DashboardEstabelecimentoRoute
+  DashboardMusicoRoute: typeof DashboardMusicoRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardEstabelecimentoRoute: DashboardEstabelecimentoRoute,
+  DashboardMusicoRoute: DashboardMusicoRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuscarRoute: BuscarRoute,
+  CadastroRoute: CadastroRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ParaEstabelecimentosRoute: ParaEstabelecimentosRoute,
+  ParaMusicosRoute: ParaMusicosRoute,
   MusicosSlugRoute: MusicosSlugRoute,
 }
 export const routeTree = rootRouteImport
