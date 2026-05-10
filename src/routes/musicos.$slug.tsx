@@ -55,9 +55,9 @@ function MusicianProfile() {
               />
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="flex items-center gap-2 font-display text-3xl font-semibold md:text-5xl">
-                    {m.artistName}
-                    <BadgeCheck className="h-6 w-6 text-primary" />
+                  <h1 className="flex flex-wrap items-center gap-2 font-display text-3xl font-semibold leading-tight pb-1 md:text-5xl">
+                    <span className="break-words">{m.artistName}</span>
+                    <BadgeCheck className="h-6 w-6 shrink-0 text-primary" />
                   </h1>
                 </div>
                 <p className="mt-1 text-muted-foreground">{m.shortBio}</p>
