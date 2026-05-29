@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Search, MapPin, Sparkles, MessageCircle, Music, ShieldCheck, Star, ArrowRight, Mic2, Calendar, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MusicianCard } from "@/components/musician-card";
 import { Button } from "@/components/ui/button";
-import { musicians, testimonials } from "@/lib/mock-data";
+import { testimonials } from "@/lib/mock-data";
+import { searchArtists } from "@/lib/api";
 import heroImg from "@/assets/hero-stage.jpg";
 
 export const Route = createFileRoute("/")({
@@ -142,7 +144,11 @@ function HowItWorks() {
 }
 
 function FeaturedMusicians() {
-  const featured = musicians.slice(0, 4);
+  const { data } = useQuery({
+    queryKey: ["artists-featured"],
+    queryFn: () => searchArtists({ limit: 4, available: true }),
+  });
+  const featured = data?.artists ?? [];
   return (
     <section className="border-t border-border bg-secondary/40">
       <div className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
@@ -192,7 +198,7 @@ function ForMusicians() {
         </div>
         <div className="relative">
           <div className="aspect-[4/5] overflow-hidden rounded-3xl shadow-elevated">
-            <img src={musicians[3].image} alt="Músico em performance" loading="lazy" className="h-full w-full object-cover" />
+            <img src={heroImg} alt="Músico em performance" loading="lazy" className="h-full w-full object-cover" />
           </div>
           <div className="absolute -bottom-6 -left-6 hidden w-64 rounded-2xl border border-border bg-card p-4 shadow-elevated md:block">
             <div className="flex items-center gap-2">
@@ -215,9 +221,9 @@ function ForVenues() {
         <div className="grid items-center gap-12 md:grid-cols-2">
           <div className="order-2 md:order-1">
             <div className="grid grid-cols-2 gap-4">
-              {musicians.slice(1, 5).map((m, i) => (
-                <div key={m.id} className={`overflow-hidden rounded-2xl shadow-elevated ${i % 2 ? "mt-8" : ""}`}>
-                  <img src={m.image} alt={m.artistName} loading="lazy" className="aspect-[3/4] h-full w-full object-cover" />
+              {[1,2,3,4].map((n, i) => (
+                <div key={n} className={`overflow-hidden rounded-2xl shadow-elevated ${i % 2 ? "mt-8" : ""}`}>
+                  <img src={`https://picsum.photos/seed/venue-${n}/300/400`} alt="Artista" loading="lazy" className="aspect-[3/4] h-full w-full object-cover" />
                 </div>
               ))}
             </div>
