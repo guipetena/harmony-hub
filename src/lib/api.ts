@@ -158,6 +158,13 @@ export function getMyArtistProfile() {
   return request<ArtistProfile>('/artists/me/profile')
 }
 
+export function updateMyArtistProfile(data: Partial<CreateArtistProfilePayload>) {
+  return request<ArtistProfile>('/artists/me/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
 // ── Bookings ─────────────────────────────────────────────────────────────
 
 export function listBookings() {
@@ -169,4 +176,38 @@ export function updateBookingStatus(id: string, status: BookingRequest['status']
     method: 'PATCH',
     body: JSON.stringify({ status }),
   })
+}
+
+// ── Availability ──────────────────────────────────────────────────────────
+
+export interface AvailabilityRecord {
+  id: string
+  date: string
+  startTime: string
+  endTime: string
+  available: boolean
+}
+
+export function listAvailability() {
+  return request<AvailabilityRecord[]>('/availability')
+}
+
+// ── Internal types ────────────────────────────────────────────────────────
+
+interface CreateArtistProfilePayload {
+  artisticName: string
+  shortBio: string
+  bio: string
+  city: string
+  state: string
+  type: string
+  priceMin: number
+  priceMax: number
+  musicalStyles: string[]
+  membersCount: number
+  available: boolean
+  whatsapp: string
+  instagram: string
+  spotify: string
+  youtube: string
 }
