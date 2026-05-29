@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { Star, MapPin, Users, BadgeCheck } from "lucide-react";
-import type { Musician } from "@/lib/mock-data";
 import { formatBRL } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
+import type { ArtistProfile } from "@/lib/api";
 
-export function MusicianCard({ m }: { m: Musician }) {
+export function MusicianCard({ m }: { m: ArtistProfile }) {
+  const image = m.medias.find((med) => med.type === "IMAGE")?.url ?? `https://picsum.photos/seed/${m.slug}/400/500`;
+
   return (
     <Link
       to="/musicos/$slug"
@@ -13,8 +15,8 @@ export function MusicianCard({ m }: { m: Musician }) {
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <img
-          src={m.image}
-          alt={m.artistName}
+          src={image}
+          alt={m.artisticName}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -29,23 +31,24 @@ export function MusicianCard({ m }: { m: Musician }) {
             <Badge variant="secondary" className="rounded-full">Agenda cheia</Badge>
           )}
         </div>
-        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/95 px-2.5 py-1 text-xs font-semibold backdrop-blur">
-          <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-          {m.rating.toFixed(1)}
-          <span className="text-muted-foreground">({m.reviewsCount})</span>
-        </div>
+        {m.verified && (
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/95 px-2.5 py-1 text-xs font-semibold backdrop-blur">
+            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+            <span className="text-muted-foreground">verificado</span>
+          </div>
+        )}
         <div className="absolute bottom-3 left-3 right-3 text-white">
           <h3 className="flex items-center gap-1.5 font-display text-xl font-semibold leading-tight">
-            {m.artistName}
-            <BadgeCheck className="h-4 w-4 text-primary" />
+            {m.artisticName}
+            {m.verified && <BadgeCheck className="h-4 w-4 text-primary" />}
           </h3>
-          <p className="text-xs text-white/80">{m.shortBio}</p>
+          {m.shortBio && <p className="text-xs text-white/80">{m.shortBio}</p>}
         </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex flex-wrap gap-1.5">
-          {m.styles.slice(0, 3).map((s) => (
+          {m.musicalStyles.slice(0, 3).map((s) => (
             <span key={s} className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
               {s}
             </span>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/auth-shell";
+import { register, ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/cadastro")({
   head: () => ({ meta: [{ title: "Criar conta — FindSinger" }] }),
@@ -16,6 +17,8 @@ type Role = "musico" | "estabelecimento" | null;
 function SignupPage() {
   const [role, setRole] = useState<Role>(null);
   const [step, setStep] = useState<"role" | "form">("role");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -51,24 +54,42 @@ function SignupPage() {
       ) : (
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            navigate({ to: role === "musico" ? "/dashboard/musico" : "/dashboard/estabelecimento" });
+            setError("");
+            const form = new FormData(e.currentTarget);
+            setLoading(true);
+            try {
+              const { user } = await register({
+                name: form.get("name") as string,
+                email: form.get("email") as string,
+                password: form.get("password") as string,
+                role: role === "musico" ? "ARTIST" : "ESTABLISHMENT",
+              });
+              navigate({ to: user.role === "ARTIST" ? "/dashboard/musico" : "/dashboard/estabelecimento" });
+            } catch (err) {
+              setError(err instanceof ApiError ? err.message : "Erro ao criar conta.");
+            } finally {
+              setLoading(false);
+            }
           }}
         >
           <div className="space-y-1.5">
             <Label htmlFor="name">{role === "musico" ? "Nome artístico" : "Nome do estabelecimento"}</Label>
-            <Input id="name" required className="h-11 rounded-xl" />
+            <Input id="name" name="name" required className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">E-mail</Label>
-            <Input id="email" type="email" required className="h-11 rounded-xl" />
+            <Input id="email" name="email" type="email" required className="h-11 rounded-xl" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" required className="h-11 rounded-xl" />
+            <Input id="password" name="password" type="password" required className="h-11 rounded-xl" />
           </div>
-          <Button type="submit" className="h-11 w-full rounded-xl">Criar conta</Button>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" disabled={loading} className="h-11 w-full rounded-xl">
+            {loading ? "Criando conta…" : "Criar conta"}
+          </Button>
           <button
             type="button"
             onClick={() => setStep("role")}

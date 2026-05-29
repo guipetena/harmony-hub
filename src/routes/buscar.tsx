@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { musicians, STYLES, CITIES, type MusicianType } from "@/lib/mock-data";
+import { STYLES, CITIES, type MusicianType } from "@/lib/mock-data";
+import { searchArtists, type ArtistProfile } from "@/lib/api";
 
 export const Route = createFileRoute("/buscar")({
   head: () => ({
@@ -23,7 +25,6 @@ export const Route = createFileRoute("/buscar")({
 const TYPES: MusicianType[] = ["Solo", "Dupla", "Banda"];
 
 function SearchPage() {
-  const [query, setQuery] = useState("");
   const [city, setCity] = useState<string>("");
   const [styles, setStyles] = useState<string[]>([]);
   const [types, setTypes] = useState<MusicianType[]>([]);
@@ -31,22 +32,30 @@ function SearchPage() {
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const results = useMemo(() => musicians.filter((m) => {
-    const q = query.trim().toLowerCase();
-    if (q && !`${m.artistName} ${m.shortBio} ${m.styles.join(" ")}`.toLowerCase().includes(q)) return false;
-    if (city && !`${m.city}, ${m.state}`.includes(city)) return false;
-    if (styles.length && !styles.some((s) => m.styles.includes(s))) return false;
-    if (types.length && !types.includes(m.type)) return false;
-    if (m.priceMin > price[1] || m.priceMax < price[0]) return false;
-    if (onlyAvailable && !m.available) return false;
-    return true;
-  }), [query, city, styles, types, price, onlyAvailable]);
+  const cityPart = city ? city.split(",")[0].trim() : undefined;
+  const statePart = city ? city.split(",")[1]?.trim() : undefined;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["artists", city, styles, types, price, onlyAvailable],
+    queryFn: () => searchArtists({
+      city: cityPart,
+      state: statePart,
+      musicalStyle: styles[0],
+      type: types[0],
+      priceMin: price[0] > 0 ? price[0] : undefined,
+      priceMax: price[1] < 6000 ? price[1] : undefined,
+      available: onlyAvailable ? true : undefined,
+      limit: 50,
+    }),
+  });
+
+  const results: ArtistProfile[] = data?.artists ?? [];
 
   const toggle = <T,>(arr: T[], v: T, setter: (n: T[]) => void) =>
     setter(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
   const clearAll = () => {
-    setQuery(""); setCity(""); setStyles([]); setTypes([]); setPrice([0, 6000]); setOnlyAvailable(false);
+    setCity(""); setStyles([]); setTypes([]); setPrice([0, 6000]); setOnlyAvailable(false);
   };
 
   const Filters = (
@@ -117,16 +126,17 @@ function SearchPage() {
           <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:px-6">
             <div>
               <h1 className="font-display text-3xl font-semibold md:text-4xl">Encontre seu som.</h1>
-              <p className="mt-1 text-muted-foreground">{results.length} artistas encontrados</p>
+              <p className="mt-1 text-muted-foreground">
+              {isLoading ? "Buscando…" : `${results.length} artistas encontrados`}
+            </p>
             </div>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar por nome, estilo ou cidade…"
                   className="h-12 rounded-full pl-10"
+                  disabled
                 />
               </div>
               <Button
@@ -150,7 +160,13 @@ function SearchPage() {
           </aside>
 
           <div>
-            {results.length === 0 ? (
+            {isLoading ? (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-muted" />
+                ))}
+              </div>
+            ) : results.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-16 text-center">
                 <p className="font-display text-xl">Nenhum artista encontrado</p>
                 <p className="mt-2 text-muted-foreground">Tente ampliar os filtros.</p>
@@ -161,6 +177,7 @@ function SearchPage() {
                 {results.map((m) => <MusicianCard key={m.id} m={m} />)}
               </div>
             )}
+
           </div>
         </section>
 
