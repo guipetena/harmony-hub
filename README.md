@@ -1,149 +1,108 @@
-# FindSinger 🎤
+# Harmony Hub 🎵
 
-Plataforma que conecta **músicos independentes** (cantores solo, duplas e bandas) com **estabelecimentos e pessoas** que querem contratar música ao vivo.
-
-> Marketplace inspirado em Airbnb, Fiverr e GetNinjas — focado em UX premium, mobile-first e contato direto via WhatsApp.
+Marketplace que conecta **músicos** (cantores, duplas e bandas) com **estabelecimentos** para contratação de música ao vivo.
 
 ---
 
-## 🧱 Stack
+## Estrutura do monorepo
 
-- **[TanStack Start](https://tanstack.com/start)** (React 19 + Vite 7) — SSR e roteamento por arquivos
-- **TypeScript** (strict)
-- **TailwindCSS v4** + **shadcn/ui** + **Radix UI**
-- **Lucide Icons**
-- **TanStack Query** para data-fetching
-- **Zod** + **React Hook Form**
+```
+harmony-hub/
+├── /          ← Frontend (TanStack Start + React + Cloudflare Pages)
+└── backend/   ← Backend (Fastify + Prisma + PostgreSQL + Railway)
+```
 
 ---
 
-## 📋 Pré-requisitos
+## Rodando localmente
 
-Instale no seu computador:
+### Pré-requisitos
 
-| Ferramenta | Versão | Link |
+- Node.js 20+
+- Docker (para o PostgreSQL do backend)
+
+### 1. Frontend
+
+```bash
+# Na raiz do projeto
+npm install
+npm run dev
+```
+
+Disponível em **http://localhost:8080**
+
+### 2. Backend
+
+```bash
+cd backend
+
+# Instalar dependências
+npm install
+
+# Subir o banco de dados via Docker
+docker compose up -d
+
+# Aplicar schema no banco
+npx prisma db push
+
+# Popular com dados de exemplo
+npm run db:seed
+
+# Iniciar servidor
+npm run dev
+```
+
+API disponível em **http://localhost:3333**
+
+### Credenciais de demo
+
+| Role | Email | Senha |
 |---|---|---|
-| **Node.js** | 20+ (LTS) | https://nodejs.org |
-| **Bun** | mais recente | https://bun.sh |
-| **Git** | qualquer | https://git-scm.com |
-
-### Instalando o Bun
-
-```bash
-# macOS / Linux
-curl -fsSL https://bun.sh/install | bash
-
-# Windows (PowerShell)
-powershell -c "irm bun.sh/install.ps1 | iex"
-```
-
-> Você pode usar `npm` ou `pnpm`, mas o projeto usa `bun.lockb` — o Bun garante as mesmas versões instaladas no Lovable.
+| Artista | `artista@demo.com` | `123456` |
+| Estabelecimento | `bar@demo.com` | `123456` |
 
 ---
 
-## 🚀 Como rodar localmente
+## Variáveis de ambiente
 
-```bash
-# 1. Clonar o repositório
-git clone https://github.com/<seu-usuario>/<seu-repo>.git
-cd <seu-repo>
+### Frontend — `.env.production`
 
-# 2. Instalar dependências
-bun install
-
-# 3. Subir o servidor de desenvolvimento
-bun dev
+```env
+VITE_API_URL=https://sua-api.up.railway.app
 ```
 
-Acesse **http://localhost:8080** (ou a porta exibida no terminal).
+Em dev, a API aponta automaticamente para `http://localhost:3333`.
+
+### Backend — `backend/.env`
+
+```bash
+cp backend/.env.example backend/.env
+# O .env já vem preenchido para dev local
+```
 
 ---
 
-## 📜 Scripts disponíveis
+## Stack
 
-| Comando | O que faz |
+| Camada | Tecnologia |
 |---|---|
-| `bun dev` | Servidor de desenvolvimento com hot reload |
-| `bun run build` | Build de produção |
-| `bun run build:dev` | Build em modo desenvolvimento |
-| `bun run preview` | Pré-visualiza o build de produção |
-| `bun run lint` | Roda o ESLint |
-| `bun run format` | Formata código com Prettier |
+| Frontend | React 19, TanStack Start, TailwindCSS v4, shadcn/ui |
+| Roteamento | TanStack Router (file-based) |
+| Data fetching | TanStack Query |
+| Backend | Fastify 4, TypeScript |
+| ORM | Prisma 5 + PostgreSQL |
+| Validação | Zod |
+| Auth | JWT (`@fastify/jwt`) |
+| Deploy frontend | Cloudflare Pages |
+| Deploy backend | Railway |
 
 ---
 
-## 🔐 Variáveis de ambiente
+## Deploy
 
-No estado atual (protótipo), **não é necessário `.env`** — todos os dados vêm de um mock estático em `src/lib/mock-data.ts`.
+Ver **`backend/PRODUCAO.md`** para o checklist completo.
 
-Quando o **Lovable Cloud** (auth + banco) for ativado, o Lovable gera automaticamente um `.env` no repositório com as chaves públicas, sincronizado via GitHub.
-
----
-
-## 📂 Estrutura do projeto
-
-```
-src/
-├── assets/            # Imagens (heros, fotos de músicos)
-├── components/
-│   ├── ui/            # Componentes shadcn/ui
-│   ├── site-header.tsx
-│   ├── site-footer.tsx
-│   ├── musician-card.tsx
-│   ├── auth-shell.tsx
-│   └── dashboard-layout.tsx
-├── hooks/             # Hooks customizados
-├── lib/
-│   ├── mock-data.ts   # Mock de músicos, estilos e cidades
-│   └── utils.ts
-├── routes/            # Rotas (file-based routing)
-│   ├── __root.tsx     # Layout raiz
-│   ├── index.tsx      # Landing page
-│   ├── buscar.tsx     # Busca com filtros
-│   ├── musicos.$slug.tsx        # Perfil do artista
-│   ├── login.tsx
-│   ├── cadastro.tsx
-│   ├── dashboard.musico.tsx
-│   └── dashboard.estabelecimento.tsx
-├── styles.css         # Tokens do design system (cores, fontes)
-├── router.tsx
-└── start.ts
-```
-
----
-
-## 🎨 Design System
-
-Os tokens de cor, tipografia e sombras vivem em **`src/styles.css`** (formato `oklch`). Use sempre as classes semânticas do Tailwind (`bg-primary`, `text-foreground`, `shadow-elevated` etc.) ao invés de cores literais.
-
-Fontes:
-- **Fraunces** (display / títulos)
-- **Plus Jakarta Sans** (corpo)
-
----
-
-## 🗺️ Status do MVP
-
-- ✅ Landing page com hero, benefícios e CTAs
-- ✅ Busca com filtros (cidade, estilo, preço, disponibilidade)
-- ✅ Perfil detalhado do artista com galeria, vídeo e avaliações
-- ✅ Telas de login/cadastro (visual)
-- ✅ Dashboards de músico e estabelecimento (visual)
-- ✅ Contato direto via link do WhatsApp
-- ⏳ Autenticação real (Lovable Cloud)
-- ⏳ Banco de dados (perfis, favoritos, histórico)
-- ⏳ Upload de fotos/vídeos
-
----
-
-## 🔄 Sync com Lovable
-
-Este repositório está conectado ao [Lovable](https://lovable.dev) — qualquer alteração feita no editor Lovable é enviada automaticamente para o GitHub, e qualquer push para a branch principal é refletido no editor.
-
-**Edite onde preferir** (Lovable, VS Code, Cursor, etc.) — a sincronização é bidirecional.
-
----
-
-## 📄 Licença
-
-Projeto privado — todos os direitos reservados.
+Resumo:
+- **Frontend** → Cloudflare Pages (`wrangler deploy`)
+- **Backend** → Railway (detecta o Dockerfile automaticamente)
+- Configurar `CORS_ORIGIN` e `VITE_API_URL` apontando um para o outro
