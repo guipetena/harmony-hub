@@ -33,6 +33,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       ...init?.headers,
     },
   })
+
+  // Token expirado ou inválido → limpa sessão e redireciona para login
+  if (res.status === 401 && path !== '/auth/login') {
+    clearAuth()
+    window.location.href = '/login'
+    throw new ApiError('Sessão expirada. Faça login novamente.', 401)
+  }
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new ApiError(body.error ?? 'Erro inesperado', res.status)
