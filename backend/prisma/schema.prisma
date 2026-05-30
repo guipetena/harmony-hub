@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ARTIST
+  ESTABLISHMENT
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artistProfile       ArtistProfile?
+  establishmentProfile EstablishmentProfile?
+
+  @@map("users")
+}
+
+model ArtistProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  slug          String   @unique
+  artisticName  String
+  shortBio      String?
+  bio           String?
+  city          String
+  state         String
+  type          String   @default("Solo") // Solo | Dupla | Banda
+  priceMin      Int
+  priceMax      Int
+  musicalStyles String[]
+  membersCount  Int      @default(1)
+  available     Boolean  @default(true)
+  whatsapp      String?
+  instagram     String?
+  spotify       String?
+  youtube       String?
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medias           ArtistMedia[]
+  availabilities   Availability[]
+  reviews          Review[]
+  bookingRequests  BookingRequest[]
+
+  @@map("artist_profiles")
+}
+
+model ArtistMedia {
+  id              String    @id @default(uuid())
+  artistProfileId String
+  type            MediaType
+  url             String
+
+  artistProfile ArtistProfile @relation(fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@map("artist_medias")
+}
+
+model Availability {
+  id              String   @id @default(uuid())
+  artistProfileId String
+  date            DateTime @db.Date
+  startTime       String   // ex: "19:00"
+  endTime         String   // ex: "23:00"
+  available       Boolean  @default(true)
+
+  artistProfile ArtistProfile @relation(fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@map("availabilities")
+}
+
+model EstablishmentProfile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  establishmentName   String
+  city                String
+  state               String
+  description         String?
+  whatsapp            String?
+  createdAt           DateTime @default(now())
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookingRequests BookingRequest[]
+  reviews         Review[]
+
+  @@map("establishment_profiles")
+}
+
+model BookingRequest {
+  id                    String        @id @default(uuid())
+  artistProfileId       String
+  establishmentProfileId String
+  eventDate             DateTime      @db.Date
+  message               String
+  estimatedBudget       Decimal? @db.Decimal(10, 2)
+  status                BookingStatus @default(PENDING)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  artistProfile        ArtistProfile        @relation(fields: [artistProfileId], references: [id])
+  establishmentProfile EstablishmentProfile @relation(fields: [establishmentProfileId], references: [id])
+
+  @@map("booking_requests")
+}
+
+model Review {
+  id                    String   @id @default(uuid())
+  artistProfileId       String
+  establishmentProfileId String
+  rating                Int      // 1 a 5
+  comment               String?
+  createdAt             DateTime @default(now())
+
+  artistProfile        ArtistProfile        @relation(fields: [artistProfileId], references: [id])
+  establishmentProfile EstablishmentProfile @relation(fields: [establishmentProfileId], references: [id])
+
+  @@map("reviews")
+}
