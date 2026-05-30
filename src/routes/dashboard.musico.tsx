@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, MessageCircle, Star, Edit3, Check, X, Loader2 } from "lucide-react";
+import { Calendar, MessageCircle, Star, Edit3, Check, X, Loader2, Music } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { formatBRL } from "@/lib/mock-data";
-import {
+import { ApiError,
   getMyArtistProfile,
   updateMyArtistProfile,
   listBookings,
@@ -39,10 +39,14 @@ function MusicianDashboard() {
   const qc = useQueryClient();
   const storedUser = getStoredUser();
 
-  const { data: profile, isLoading: loadingProfile } = useQuery({
+  const { data: profile, isLoading: loadingProfile, error: profileError } = useQuery({
     queryKey: ["my-artist-profile"],
     queryFn: getMyArtistProfile,
+    retry: false,
   });
+
+  // Artista recém-cadastrado ainda não criou o perfil artístico
+  const noProfile = profileError instanceof ApiError && profileError.status === 404;
 
   const { data: bookings = [], isLoading: loadingBookings } = useQuery({
     queryKey: ["bookings"],
@@ -59,6 +63,28 @@ function MusicianDashboard() {
       updateBookingStatus(id, status),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["bookings"] }),
   });
+
+  // Onboarding: artista criou conta mas ainda não completou o perfil artístico
+  if (noProfile) {
+    return (
+      <DashboardLayout role="musico">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-6 py-20 text-center">
+          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-primary/10 text-primary">
+            <Music className="h-10 w-10" />
+          </div>
+          <div>
+            <h1 className="font-display text-3xl font-semibold">Complete seu perfil</h1>
+            <p className="mt-2 text-muted-foreground">
+              Antes de receber solicitações, você precisa criar seu perfil artístico para aparecer nas buscas.
+            </p>
+          </div>
+          <Button size="lg" className="rounded-full" onClick={() => alert("Em breve: tela de criação de perfil artístico")}>
+            Criar meu perfil agora
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const image = profile?.medias.find((m) => m.type === "IMAGE")?.url
     ?? `https://picsum.photos/seed/${profile?.slug ?? "artist"}/400/400`;
